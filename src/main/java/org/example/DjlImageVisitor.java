@@ -3,6 +3,7 @@ package org.example;
 import ai.djl.MalformedModelException;
 import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
+import ai.djl.modality.cv.DetectedObjects;
 import ai.djl.mxnet.zoo.MxModelZoo;
 import ai.djl.repository.zoo.ModelNotFoundException;
 import ai.djl.translate.TranslateException;
@@ -17,10 +18,10 @@ import java.util.Optional;
 
 public class DjlImageVisitor extends H264FrameDecoder {
 
-    Predictor<BufferedImage, Classifications> predictor;
+    Predictor<BufferedImage, DetectedObjects> predictor;
 
     public DjlImageVisitor() throws IOException, ModelNotFoundException, MalformedModelException {
-        predictor = MxModelZoo.RESNET.loadModel().newPredictor();
+        predictor = MxModelZoo.SSD.loadModel().newPredictor();
     }
 
     @Override
@@ -31,7 +32,7 @@ public class DjlImageVisitor extends H264FrameDecoder {
 
         try {
             Classifications prediction = predictor.predict(bufferedImage);
-            System.out.println(prediction.topK(5).toString());
+            System.out.println("Found " + prediction.items().size() + " objects");
         } catch (TranslateException e) {
             throw new FrameProcessException("Failed to predict", e);
         }

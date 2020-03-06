@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 group 'org.example'
@@ -28,4 +29,14 @@ dependencies {
     implementation "software.amazon.awssdk:kinesisvideo:2.10.75"
     implementation "software.amazon.kinesis:amazon-kinesis-client:2.2.9"
     implementation "com.amazonaws:amazon-kinesis-video-streams-parser-library:1.0.13"
+}
+
+application {
+    mainClassName = System.getProperty("main", "org.example.App")
+}
+
+run {
+    systemProperties System.getProperties()
+    systemProperties.remove("user.dir")
+    systemProperty("file.encoding", "UTF-8")
 }
