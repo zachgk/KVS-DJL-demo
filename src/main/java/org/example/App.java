@@ -10,7 +10,9 @@ import com.amazonaws.services.kinesisvideo.AmazonKinesisVideo;
 import com.amazonaws.services.kinesisvideo.AmazonKinesisVideoClientBuilder;
 import com.amazonaws.services.kinesisvideo.model.StartSelector;
 import com.amazonaws.services.kinesisvideo.model.StartSelectorType;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -27,11 +29,20 @@ public class App {
         amazonKinesisVideoBuilder.setCredentials(new SystemPropertiesCredentialsProvider());
         AmazonKinesisVideo amazonKinesisVideo = amazonKinesisVideoBuilder.build();
 
+        File outDir = Paths.get("out").toFile();
+        if(!outDir.exists()) {
+            outDir.mkdir();
+        }
+
+        for(File outFile : outDir.listFiles()) {
+            outFile.delete();
+        }
+
         FrameVisitor frameVisitor = FrameVisitor.create(new DjlImageVisitor());
 
         ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-        GetMediaWorker getMediaWorker = GetMediaWorker.create(Regions.US_EAST_1, new SystemPropertiesCredentialsProvider(), STREAM_NAME, new StartSelector().withStartSelectorType(
+        GetMediaWorker getMediaWorker = GetMediaWorker.create(REGION, new SystemPropertiesCredentialsProvider(), STREAM_NAME, new StartSelector().withStartSelectorType(
             StartSelectorType.NOW), amazonKinesisVideo, frameVisitor);
         executorService.submit(getMediaWorker);
     }

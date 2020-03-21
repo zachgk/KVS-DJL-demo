@@ -35,9 +35,8 @@ public class DjlImageVisitor extends H264FrameDecoder {
     public void process(Frame frame, MkvTrackMetadata trackMetadata,
         Optional<FragmentMetadata> fragmentMetadata) throws FrameProcessException {
 
-        BufferedImage bufferedImage = decodeH264Frame(frame, trackMetadata);
-
         try {
+            BufferedImage bufferedImage = decodeH264Frame(frame, trackMetadata);
             DetectedObjects prediction = predictor.predict(bufferedImage);
             String classStr = prediction.items().stream().map(Classification::getClassName).collect(
                 Collectors.joining(", "));
@@ -48,7 +47,7 @@ public class DjlImageVisitor extends H264FrameDecoder {
             File outputFile = Paths.get("out/image-" + counter + ".png").toFile();
             ImageIO.write(bufferedImage, "png", outputFile);
             counter++;
-        } catch (TranslateException | IOException e) {
+        } catch (Exception e) {
             throw new FrameProcessException("Failed to predict", e);
         }
     }
